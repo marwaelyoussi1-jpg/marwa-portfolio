@@ -1,7 +1,12 @@
+/* =================================
+   MENU MOBILE
+================================= */
+
 const menuToggle = document.getElementById("menu-toggle");
 const navbar = document.getElementById("navbar");
 
 if (menuToggle && navbar) {
+
     menuToggle.addEventListener("click", () => {
         const isOpen = navbar.classList.toggle("active");
 
@@ -12,8 +17,8 @@ if (menuToggle && navbar) {
         );
     });
 
-    // Fermer le menu après avoir choisi une page
-    navbar.querySelectorAll("a").forEach(link => {
+    // Fermer le menu après avoir choisi une rubrique
+    navbar.querySelectorAll("a:not(.dropdown-toggle)").forEach(link => {
         link.addEventListener("click", () => {
             navbar.classList.remove("active");
             menuToggle.setAttribute("aria-expanded", "false");
@@ -22,135 +27,69 @@ if (menuToggle && navbar) {
     });
 }
 
-// MENU DEROULANT PROFIL
 
-const profileDropdown = document.querySelector(".nav-dropdown");
-const profileButton = document.getElementById("profile-dropdown");
-
-if (profileDropdown && profileButton) {
-
-    profileButton.addEventListener("click", function () {
-        profileDropdown.classList.toggle("open");
-    });
-
-    // Fermer le menu après avoir choisi une rubrique
-    profileDropdown.querySelectorAll(".dropdown-menu a").forEach(link => {
-        link.addEventListener("click", function () {
-            profileDropdown.classList.remove("open");
-        });
-    });
-
-    // Fermer si on clique ailleurs
-    document.addEventListener("click", function (event) {
-        if (!profileDropdown.contains(event.target)) {
-            profileDropdown.classList.remove("open");
-        }
-    });
-}
 /* =================================
-   GALERIE PHOTOS INTERACTIVE
+   MENUS DÉROULANTS
+   PROFIL ET EXPÉRIENCES
 ================================= */
 
-const gallery = document.querySelector(".stm-gallery");
+const dropdowns = document.querySelectorAll(".nav-dropdown");
 
-if (gallery) {
+dropdowns.forEach(dropdown => {
 
-    const photos = gallery.querySelectorAll(".stm-photo img");
+    const toggle = dropdown.querySelector(".dropdown-toggle");
 
-    const lightbox = document.getElementById("lightbox");
-    const lightboxImage = document.getElementById("lightbox-image");
-    const lightboxCaption = document.getElementById("lightbox-caption");
-    const lightboxCounter = document.getElementById("lightbox-counter");
+    if (!toggle) return;
 
-    const closeButton = document.getElementById("lightbox-close");
-    const prevButton = document.getElementById("lightbox-prev");
-    const nextButton = document.getElementById("lightbox-next");
+    toggle.addEventListener("click", event => {
 
-    let currentIndex = 0;
+        if (window.innerWidth <= 700) {
+            event.preventDefault();
 
-    function showPhoto(index) {
+            // Fermer les autres menus déroulants
+            dropdowns.forEach(otherDropdown => {
+                if (otherDropdown !== dropdown) {
+                    otherDropdown.classList.remove("open");
+                }
+            });
 
-        currentIndex = (index + photos.length) % photos.length;
+            dropdown.classList.toggle("open");
+        }
+    });
 
-        const photo = photos[currentIndex];
+    // Fermer le sous-menu après avoir choisi une rubrique
+    dropdown.querySelectorAll(".dropdown-menu a").forEach(link => {
+        link.addEventListener("click", () => {
+            dropdown.classList.remove("open");
 
-        lightboxImage.src = photo.src;
-        lightboxImage.alt = photo.alt;
+            if (navbar) {
+                navbar.classList.remove("active");
+            }
 
-        const caption = photo.parentElement.querySelector("p");
-
-        lightboxCaption.textContent = caption ? caption.textContent : "";
-
-        lightboxCounter.textContent =
-            `${currentIndex + 1} / ${photos.length}`;
-    }
-
-    function openLightbox(index) {
-
-        showPhoto(index);
-
-        lightbox.classList.add("active");
-        document.body.style.overflow = "hidden";
-    }
-
-    function closeLightbox() {
-
-        lightbox.classList.remove("active");
-        document.body.style.overflow = "";
-    }
-
-    photos.forEach((photo, index) => {
-
-        photo.addEventListener("click", () => {
-            openLightbox(index);
+            if (menuToggle) {
+                menuToggle.setAttribute("aria-expanded", "false");
+                menuToggle.setAttribute("aria-label", "Ouvrir le menu");
+            }
         });
-
     });
 
-    nextButton.addEventListener("click", () => {
-        showPhoto(currentIndex + 1);
-    });
+});
 
-    prevButton.addEventListener("click", () => {
-        showPhoto(currentIndex - 1);
-    });
-
-    closeButton.addEventListener("click", closeLightbox);
-
-    lightbox.addEventListener("click", (event) => {
-
-        if (event.target === lightbox) {
-            closeLightbox();
+// Fermer les menus déroulants si on clique ailleurs
+document.addEventListener("click", event => {
+    dropdowns.forEach(dropdown => {
+        if (!dropdown.contains(event.target)) {
+            dropdown.classList.remove("open");
         }
-
     });
+});
 
-    document.addEventListener("keydown", (event) => {
-
-        if (!lightbox.classList.contains("active")) return;
-
-        if (event.key === "Escape") {
-            closeLightbox();
-        }
-
-        if (event.key === "ArrowRight") {
-            showPhoto(currentIndex + 1);
-        }
-
-        if (event.key === "ArrowLeft") {
-            showPhoto(currentIndex - 1);
-        }
-
-    });
-
-}
 
 /* =================================
    GALERIES PHOTOS INTERACTIVES
 ================================= */
 
 const galleries = document.querySelectorAll(".stm-gallery");
-
 const lightbox = document.getElementById("lightbox");
 
 if (galleries.length > 0 && lightbox) {
@@ -167,6 +106,8 @@ if (galleries.length > 0 && lightbox) {
     let currentIndex = 0;
 
     function showPhoto(index) {
+
+        if (currentPhotos.length === 0) return;
 
         currentIndex = (index + currentPhotos.length) % currentPhotos.length;
 
@@ -186,7 +127,6 @@ if (galleries.length > 0 && lightbox) {
     function openLightbox(photos, index) {
 
         currentPhotos = photos;
-
         showPhoto(index);
 
         lightbox.classList.add("active");
@@ -201,7 +141,9 @@ if (galleries.length > 0 && lightbox) {
 
     galleries.forEach(gallery => {
 
-        const photos = Array.from(gallery.querySelectorAll(".stm-photo img"));
+        const photos = Array.from(
+            gallery.querySelectorAll(".stm-photo img")
+        );
 
         photos.forEach((photo, index) => {
 
@@ -213,53 +155,35 @@ if (galleries.length > 0 && lightbox) {
 
     });
 
-    nextButton.addEventListener("click", () => {
-        showPhoto(currentIndex + 1);
-    });
+    if (nextButton) {
+        nextButton.addEventListener("click", () => {
+            showPhoto(currentIndex + 1);
+        });
+    }
 
-    prevButton.addEventListener("click", () => {
-        showPhoto(currentIndex - 1);
-    });
+    if (prevButton) {
+        prevButton.addEventListener("click", () => {
+            showPhoto(currentIndex - 1);
+        });
+    }
 
-    closeButton.addEventListener("click", closeLightbox);
+    if (closeButton) {
+        closeButton.addEventListener("click", closeLightbox);
+    }
 
     lightbox.addEventListener("click", event => {
-
         if (event.target === lightbox) {
             closeLightbox();
         }
-
     });
 
     document.addEventListener("keydown", event => {
 
         if (!lightbox.classList.contains("active")) return;
 
-        if (event.key === "Escape") {
-            closeLightbox();
-        }
+        if (event.key === "Escape") closeLightbox();
+        if (event.key === "ArrowRight") showPhoto(currentIndex + 1);
+        if (event.key === "ArrowLeft") showPhoto(currentIndex - 1);
 
-        if (event.key === "ArrowRight") {
-            showPhoto(currentIndex + 1);
-        }
-
-        if (event.key === "ArrowLeft") {
-            showPhoto(currentIndex - 1);
-        }
-
-    });
-
-}
-/* MENU DEROULANT EXPERIENCES */
-
-const experienceDropdown = document.querySelector(".nav-dropdown");
-const experienceToggle = document.querySelector(".dropdown-toggle");
-
-if (experienceDropdown && experienceToggle) {
-    experienceToggle.addEventListener("click", function(event) {
-        if (window.innerWidth <= 700) {
-            event.preventDefault();
-            experienceDropdown.classList.toggle("open");
-        }
     });
 }
