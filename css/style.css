@@ -2743,3 +2743,78 @@ header {
         font-size: 12px;
     }
 }
+/* =====================================
+   CORRECTION DEFINITIVE DU MENU MOBILE
+===================================== */
+
+@media screen and (max-width: 700px) {
+
+    .header {
+        position: sticky;
+        top: 0;
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 80px;
+        padding: 0 6%;
+        background: var(--cream);
+    }
+
+    /* Menu fermé par défaut */
+    .header .navbar:not(.active) {
+        display: none !important;
+    }
+
+    /* Menu visible uniquement après le clic */
+    .header .navbar.active {
+        display: flex !important;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        margin: 0;
+        padding: 25px 20px;
+        flex-direction: column;
+        align-items: center;
+        gap: 22px;
+        background: var(--white);
+        border-bottom: 1px solid #eee2dc;
+        box-shadow: 0 8px 15px rgba(0,0,0,0.05);
+    }
+
+    .menu-toggle {
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        gap: 6px;
+        z-index: 10000;
+    }
+
+    .nav-dropdown {
+        display: flex;
+        flex-direction: column;
+        height: auto;
+    }
+
+    .nav-dropdown .dropdown-menu {
+        position: static;
+        display: none;
+        box-shadow: none;
+        border: none;
+        text-align: center;
+    }
+
+    .nav-dropdown.open .dropdown-menu {
+        display: block;
+    }
+
+    .nav-dropdown:hover .dropdown-menu {
+        display: none;
+    }
+
+    .nav-dropdown.open:hover .dropdown-menu {
+        display: block;
+    }
+}
